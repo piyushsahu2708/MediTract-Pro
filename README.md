@@ -58,6 +58,3 @@ MediTrack Pro is a modern **hospital management web application** designed to st
 - Role-based access control
 
 ---
-
-## 📂 Project Structure
-
