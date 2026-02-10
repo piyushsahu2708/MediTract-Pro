@@ -53,21 +53,6 @@ export const patientWorkflowData = {
   ]
 }
 
-export const patientAdmissionsChartData = [
-  { month: 'Jan', total: Math.floor(Math.random() * 50) + 10 },
-  { month: 'Feb', total: Math.floor(Math.random() * 50) + 10 },
-  { month: 'Mar', total: Math.floor(Math.random() * 50) + 10 },
-  { month: 'Apr', total: Math.floor(Math.random() * 50) + 10 },
-  { month: 'May', total: Math.floor(Math.random() * 50) + 10 },
-  { month: 'Jun', total: Math.floor(Math.random() * 50) + 10 },
-  { month: 'Jul', total: Math.floor(Math.random() * 50) + 10 },
-  { month: 'Aug', total: Math.floor(Math.random() * 50) + 10 },
-  { month: 'Sep', total: Math.floor(Math.random() * 50) + 10 },
-  { month: 'Oct', total: Math.floor(Math.random() * 50) + 10 },
-  { month: 'Nov', total: Math.floor(Math.random() * 50) + 10 },
-  { month: 'Dec', total: Math.floor(Math.random() * 50) + 10 },
-]
-
 export const recentActivities = [
     { id: 1, user: 'Dr. Reed', action: 'updated patient record for', target: 'Noah Williams', time: '2 hours ago' },
     { id: 2, user: 'Nurse Miller', action: 'scheduled a new appointment for', target: 'Liam Johnson', time: '5 hours ago' },

@@ -20,15 +20,21 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Calendar as UICalendar } from "@/components/ui/calendar"
-import { appointments, patients } from "@/lib/data"
+import { appointments } from "@/lib/data"
 import { Badge } from "@/components/ui/badge"
 
 export default function AppointmentsPage() {
-  const [date, setDate] = React.useState<Date | undefined>(new Date())
+  const [date, setDate] = React.useState<Date | undefined>()
 
-  const todaysAppointments = appointments.filter(
-    (appt) => new Date(appt.date).toDateString() === (date || new Date()).toDateString()
-  )
+  React.useEffect(() => {
+    setDate(new Date())
+  }, [])
+
+  const todaysAppointments = date
+    ? appointments.filter(
+        (appt) => new Date(appt.date).toDateString() === date.toDateString()
+      )
+    : []
 
   return (
     <>
@@ -66,6 +72,8 @@ export default function AppointmentsPage() {
                     "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
                   day_today: "bg-accent text-accent-foreground",
                 }}
+                disabled={(day) => day < new Date("1900-01-01")}
+                initialFocus
               />
             </CardContent>
           </Card>
@@ -74,7 +82,7 @@ export default function AppointmentsPage() {
           <Card>
             <CardHeader>
               <CardTitle>
-                Appointments for {date ? date.toLocaleDateString() : "today"}
+                Appointments for {date ? date.toLocaleDateString() : "loading..."}
               </CardTitle>
               <CardDescription>
                 {todaysAppointments.length > 0
@@ -112,7 +120,7 @@ export default function AppointmentsPage() {
               ) : (
                 <div className="text-center py-10">
                     <Calendar className="mx-auto h-12 w-12 text-muted-foreground" />
-                    <p className="mt-4 text-muted-foreground">No appointments here.</p>
+                    <p className="mt-4 text-muted-foreground">{date ? "No appointments here." : "Loading appointments..."}</p>
                 </div>
               )}
             </CardContent>

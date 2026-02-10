@@ -1,3 +1,6 @@
+"use client"
+
+import * as React from "react"
 import {
   Card,
   CardContent,
@@ -26,10 +29,35 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
-import { patientAdmissionsChartData, recentActivities, patients, appointments } from "@/lib/data"
+import { recentActivities, patients, appointments } from "@/lib/data"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function Dashboard() {
+  const [admissionsData, setAdmissionsData] = React.useState<any[]>([])
+  const [appointmentsToday, setAppointmentsToday] = React.useState(0)
+
+  React.useEffect(() => {
+    const data = [
+      { month: 'Jan', total: Math.floor(Math.random() * 50) + 10 },
+      { month: 'Feb', total: Math.floor(Math.random() * 50) + 10 },
+      { month: 'Mar', total: Math.floor(Math.random() * 50) + 10 },
+      { month: 'Apr', total: Math.floor(Math.random() * 50) + 10 },
+      { month: 'May', total: Math.floor(Math.random() * 50) + 10 },
+      { month: 'Jun', total: Math.floor(Math.random() * 50) + 10 },
+      { month: 'Jul', total: Math.floor(Math.random() * 50) + 10 },
+      { month: 'Aug', total: Math.floor(Math.random() * 50) + 10 },
+      { month: 'Sep', total: Math.floor(Math.random() * 50) + 10 },
+      { month: 'Oct', total: Math.floor(Math.random() * 50) + 10 },
+      { month: 'Nov', total: Math.floor(Math.random() * 50) + 10 },
+      { month: 'Dec', total: Math.floor(Math.random() * 50) + 10 },
+    ]
+    setAdmissionsData(data)
+
+    const today = new Date().toDateString()
+    const todayAppts = appointments.filter(a => new Date(a.date).toDateString() === today).length
+    setAppointmentsToday(todayAppts)
+  }, [])
+
   const chartConfig = {
     total: {
       label: "Patients",
@@ -58,7 +86,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {appointments.filter(a => new Date(a.date).toDateString() === new Date().toDateString()).length}
+              {appointmentsToday}
             </div>
             <p className="text-xs text-muted-foreground">+3 scheduled for tomorrow</p>
           </CardContent>
@@ -92,7 +120,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="pl-2">
             <ChartContainer config={chartConfig} className="h-[300px] w-full">
-              <BarChart data={patientAdmissionsChartData} accessibilityLayer>
+              <BarChart data={admissionsData} accessibilityLayer>
                 <CartesianGrid vertical={false} />
                 <XAxis
                   dataKey="month"
