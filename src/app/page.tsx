@@ -20,9 +20,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Logo } from '@/components/logo'
 import { Loader2 } from 'lucide-react'
 import { useAuth, useUser } from '@/firebase'
-import { initiateEmailSignIn } from '@/firebase/non-blocking-login'
 import { useToast } from '@/hooks/use-toast'
 import React from 'react'
+import { signInWithEmailAndPassword } from 'firebase/auth'
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -34,7 +34,7 @@ type LoginFormValues = z.infer<typeof loginSchema>
 export default function LoginPage() {
   const router = useRouter()
   const auth = useAuth()
-  const { user, isUserLoading, userError } = useUser()
+  const { user, isUserLoading } = useUser()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -52,22 +52,26 @@ export default function LoginPage() {
     }
   }, [user, router])
 
-  const onSubmit = (data: LoginFormValues) => {
+  const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true)
-    initiateEmailSignIn(auth, data.email, data.password)
-  }
-  
-  React.useEffect(() => {
-    if (userError) {
+    try {
+      await signInWithEmailAndPassword(auth, data.email, data.password)
+    } catch (error: any) {
       setIsLoading(false);
+      let description = "An unexpected error occurred. Please try again."
+      if (error.code === 'auth/invalid-credential') {
+        description = "The email or password you entered is incorrect. Please try again."
+      } else {
+        description = "An error occurred during sign-in. Please try again later."
+        console.error("Sign-in error:", error);
+      }
       toast({
         variant: "destructive",
-        title: "Sign in failed",
-        description: userError.message,
+        title: "Sign in Failed",
+        description: description,
       })
     }
-  }, [userError, toast]);
-
+  }
 
   if (isUserLoading || user) {
     return (
