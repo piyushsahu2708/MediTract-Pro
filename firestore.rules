@@ -160,7 +160,7 @@ service cloud.firestore {
       allow get, list: if isStaffOrAdmin();
       allow create: if isStaffOrAdmin() && request.resource.data.id == patientId;
       allow update: if isStaffOrAdmin() && isExistingDoc();
-      allow delete: if isAdmin() && isExistingDoc();
+      allow delete: if isStaffOrAdmin() && isExistingDoc();
 
       // ------------------------------------------------------------------
       // Patient Sub-Collections

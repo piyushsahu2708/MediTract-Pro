@@ -1,12 +1,13 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Patient } from "@/lib/data"
+import { Patient } from "@/lib/types"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DataTableRowActions } from "./data-table-row-actions"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { PlaceHolderImages } from "@/lib/placeholder-images"
+import { format } from "date-fns"
 
 export const columns: ColumnDef<Patient>[] = [
   {
@@ -32,19 +33,20 @@ export const columns: ColumnDef<Patient>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "name",
+    accessorKey: "firstName",
     header: "Name",
     cell: ({ row }) => {
       const patient = row.original
+      const name = `${patient.firstName} ${patient.lastName}`
       const avatar = PlaceHolderImages.find(p => p.id === patient.avatar)
       return (
         <div className="flex items-center gap-3">
           <Avatar>
-            <AvatarImage src={avatar?.imageUrl} alt={patient.name} />
-            <AvatarFallback>{patient.name.charAt(0)}</AvatarFallback>
+            {avatar && <AvatarImage src={avatar?.imageUrl} alt={name} />}
+            <AvatarFallback>{patient.firstName?.charAt(0)}{patient.lastName?.charAt(0)}</AvatarFallback>
           </Avatar>
           <div>
-            <div className="font-medium">{patient.name}</div>
+            <div className="font-medium">{name}</div>
             <div className="text-sm text-muted-foreground">{patient.email}</div>
           </div>
         </div>
@@ -56,27 +58,22 @@ export const columns: ColumnDef<Patient>[] = [
     header: "Gender",
   },
   {
-    accessorKey: "age",
+    accessorKey: "dateOfBirth",
     header: "Age",
-  },
-  {
-    accessorKey: "lastVisit",
-    header: "Last Visit",
     cell: ({ row }) => {
-      return new Date(row.original.lastVisit).toLocaleDateString()
+        const dateOfBirth = row.getValue("dateOfBirth") as string;
+        if (!dateOfBirth) return "N/A";
+        const age = new Date().getFullYear() - new Date(dateOfBirth).getFullYear();
+        return age;
     }
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "admissionDate",
+    header: "Admission Date",
     cell: ({ row }) => {
-      const status = row.getValue("status") as string
-      return (
-        <Badge variant={status === "Active" ? "secondary" : "outline"} className={status === "Active" ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300" : ""}>
-            {status}
-        </Badge>
-      )
-    },
+        const admissionDate = row.getValue("admissionDate") as string;
+        return format(new Date(admissionDate), "PP")
+    }
   },
   {
     id: "actions",

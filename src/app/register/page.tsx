@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
@@ -19,6 +19,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Logo } from '@/components/logo'
 import { Loader2 } from 'lucide-react'
+import { FirestorePermissionError, errorEmitter, useAuth, useFirestore, useUser } from '@/firebase'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { doc, setDoc } from 'firebase/firestore'
+import { useToast } from '@/hooks/use-toast'
 
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -31,6 +35,10 @@ type RegisterFormValues = z.infer<typeof registerSchema>
 
 export default function RegisterPage() {
   const router = useRouter()
+  const auth = useAuth()
+  const firestore = useFirestore()
+  const { user, isUserLoading } = useUser()
+  const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<RegisterFormValues>({
@@ -43,13 +51,67 @@ export default function RegisterPage() {
     },
   })
 
-  const onSubmit = (data: RegisterFormValues) => {
-    setIsLoading(true)
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
+  useEffect(() => {
+    if (user) {
       router.push('/dashboard')
-    }, 1500)
+    }
+  }, [user, router])
+
+  const onSubmit = async (data: RegisterFormValues) => {
+    setIsLoading(true)
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password)
+      const user = userCredential.user
+      
+      const roleCollection = `roles_${data.role}`
+      const roleRef = doc(firestore, roleCollection, user.uid)
+      setDoc(roleRef, { active: true }).catch(serverError => {
+          const permissionError = new FirestorePermissionError({
+              path: roleRef.path,
+              operation: 'create',
+              requestResourceData: { active: true },
+          });
+          errorEmitter.emit('permission-error', permissionError);
+      });
+      
+      if (data.role === 'doctor') {
+        const [firstName, ...lastNameParts] = data.name.split(' ');
+        const lastName = lastNameParts.join(' ');
+        const doctorRef = doc(firestore, 'doctors', user.uid);
+        const doctorData = {
+            id: user.uid,
+            firstName: firstName,
+            lastName: lastName,
+            email: data.email,
+            specialization: 'General Medicine',
+            contactNumber: ''
+        };
+        setDoc(doctorRef, doctorData, { merge: true }).catch(serverError => {
+            const permissionError = new FirestorePermissionError({
+                path: doctorRef.path,
+                operation: 'create',
+                requestResourceData: doctorData,
+            });
+            errorEmitter.emit('permission-error', permissionError);
+        });
+      }
+
+    } catch (error: any) {
+      setIsLoading(false)
+      toast({
+        variant: "destructive",
+        title: "Registration failed",
+        description: error.message,
+      })
+    }
+  }
+
+  if (isUserLoading || user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin" />
+      </div>
+    );
   }
 
   return (

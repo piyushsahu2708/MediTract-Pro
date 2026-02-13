@@ -29,12 +29,18 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
-import { recentActivities, patients, appointments } from "@/lib/data"
+import { recentActivities, appointments } from "@/lib/data"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase"
+import { collection } from "firebase/firestore"
 
 export default function Dashboard() {
   const [admissionsData, setAdmissionsData] = React.useState<any[]>([])
   const [appointmentsToday, setAppointmentsToday] = React.useState(0)
+  const firestore = useFirestore();
+  const patientsCollection = useMemoFirebase(() => collection(firestore, "patients"), [firestore]);
+  const { data: patientsData } = useCollection(patientsCollection);
+  const totalPatients = patientsData ? patientsData.length : 0;
 
   React.useEffect(() => {
     const data = [
@@ -75,7 +81,7 @@ export default function Dashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{patients.length}</div>
+            <div className="text-2xl font-bold">{totalPatients}</div>
             <p className="text-xs text-muted-foreground">+2 since last month</p>
           </CardContent>
         </Card>

@@ -16,10 +16,13 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Logo } from '@/components/logo'
 import { Loader2 } from 'lucide-react'
+import { useAuth, useUser } from '@/firebase'
+import { initiateEmailSignIn } from '@/firebase/non-blocking-login'
+import { useToast } from '@/hooks/use-toast'
+import React from 'react'
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -30,6 +33,9 @@ type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
   const router = useRouter()
+  const auth = useAuth()
+  const { user, isUserLoading, userError } = useUser()
+  const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<LoginFormValues>({
@@ -40,14 +46,37 @@ export default function LoginPage() {
     },
   })
 
+  React.useEffect(() => {
+    if (user) {
+      router.push('/dashboard')
+    }
+  }, [user, router])
+
   const onSubmit = (data: LoginFormValues) => {
     setIsLoading(true)
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      router.push('/dashboard')
-    }, 1500)
+    initiateEmailSignIn(auth, data.email, data.password)
   }
+  
+  React.useEffect(() => {
+    if (userError) {
+      setIsLoading(false);
+      toast({
+        variant: "destructive",
+        title: "Sign in failed",
+        description: userError.message,
+      })
+    }
+  }, [userError, toast]);
+
+
+  if (isUserLoading || user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin" />
+      </div>
+    );
+  }
+
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
