@@ -6,14 +6,18 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Button } from "@/components/ui/button";
 import { Loader2, Pencil } from "lucide-react";
-import { useDoc, useFirestore, useMemoFirebase } from "@/firebase";
+import { useDoc, useFirestore, useMemoFirebase, useUser } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { Patient } from "@/lib/types";
 import { format } from "date-fns";
 
 export default function PatientDetailPage({ params }: { params: { id: string } }) {
   const firestore = useFirestore()
-  const patientRef = useMemoFirebase(() => doc(firestore, 'patients', params.id), [firestore, params.id]);
+  const { user } = useUser();
+  const patientRef = useMemoFirebase(() => {
+    if (!user) return null;
+    return doc(firestore, 'patients', params.id);
+  }, [firestore, user, params.id]);
   const { data: patient, isLoading } = useDoc<Patient>(patientRef);
 
   if (isLoading) {

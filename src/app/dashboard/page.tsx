@@ -31,14 +31,18 @@ import {
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { recentActivities, appointments } from "@/lib/data"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useCollection, useFirestore, useMemoFirebase } from "@/firebase"
+import { useCollection, useFirestore, useMemoFirebase, useUser } from "@/firebase"
 import { collection } from "firebase/firestore"
 
 export default function Dashboard() {
   const [admissionsData, setAdmissionsData] = React.useState<any[]>([])
   const [appointmentsToday, setAppointmentsToday] = React.useState(0)
   const firestore = useFirestore();
-  const patientsCollection = useMemoFirebase(() => collection(firestore, "patients"), [firestore]);
+  const { user } = useUser();
+  const patientsCollection = useMemoFirebase(() => {
+    if (!user) return null;
+    return collection(firestore, "patients")
+  }, [firestore, user]);
   const { data: patientsData } = useCollection(patientsCollection);
   const totalPatients = patientsData ? patientsData.length : 0;
 

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { PlusCircle, Loader2 } from "lucide-react"
 import { DataTable } from "./components/data-table"
 import { columns } from "./components/columns"
-import { useCollection, useFirestore, useMemoFirebase } from "@/firebase"
+import { useCollection, useFirestore, useMemoFirebase, useUser } from "@/firebase"
 import { collection } from "firebase/firestore"
 import { Patient } from "@/lib/types"
 import {
@@ -21,7 +21,11 @@ import PatientForm from "./components/patient-form"
 
 export default function PatientsPage() {
     const firestore = useFirestore()
-    const patientsCollection = useMemoFirebase(() => collection(firestore, "patients"), [firestore]);
+    const { user } = useUser();
+    const patientsCollection = useMemoFirebase(() => {
+        if (!user) return null;
+        return collection(firestore, "patients")
+    }, [firestore, user]);
     const { data: patients, isLoading } = useCollection<Patient>(patientsCollection)
     const [open, setOpen] = React.useState(false);
 
