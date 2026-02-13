@@ -161,6 +161,9 @@ export default function PatientForm({ onSuccess }: PatientFormProps) {
                             disabled={(date) =>
                             date > new Date() || date < new Date("1900-01-01")
                             }
+                            caption_layout="dropdown-buttons"
+                            fromYear={1900}
+                            toYear={new Date().getFullYear()}
                         />
                         </PopoverContent>
                     </Popover>
