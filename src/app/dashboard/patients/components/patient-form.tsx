@@ -6,7 +6,7 @@ import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { FirestorePermissionError, errorEmitter, useFirestore } from "@/firebase"
+import { FirestorePermissionError, errorEmitter, useFirestore, useUser } from "@/firebase"
 import { collection, setDoc, doc } from "firebase/firestore"
 import { useState } from "react"
 import { Loader2 } from "lucide-react"
@@ -34,6 +34,7 @@ interface PatientFormProps {
 
 export default function PatientForm({ onSuccess }: PatientFormProps) {
   const firestore = useFirestore()
+  const { user } = useUser();
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
@@ -52,6 +53,15 @@ export default function PatientForm({ onSuccess }: PatientFormProps) {
   })
 
   function onSubmit(values: FormValues) {
+    if (!user) {
+        toast({
+            variant: "destructive",
+            title: "Not Authenticated",
+            description: "You must be logged in to add a patient.",
+        });
+        setIsLoading(false);
+        return;
+    }
     setIsLoading(true);
     const patientsCollection = collection(firestore, "patients");
     const newPatientRef = doc(patientsCollection);

@@ -117,27 +117,21 @@ service cloud.firestore {
     // Role Collections
     // --------------------------------------------------------------------
 
-    /**
-     * @description Secure placeholder collections for managing user roles.
-     * These collections should only be managed by a trusted server-side process (e.g., Admin SDK)
-     * and are therefore locked down completely from client-side access.
-     * @path /roles_admin/{userId}, /roles_doctor/{userId}, /roles_staff/{userId}
-     * @allow (any): N/A. No client operation is ever permitted.
-     * @deny (any): Any client, authenticated or not, attempting to read or write roles.
-     * @principle Server-Side Management: Critical authorization data like roles must not be
-     * modifiable by clients to maintain the integrity of the security model.
-     */
-    // FIX: The original `match /roles_{role}/{userId}` syntax is invalid.
-    // It is not possible to embed a wildcard within a path segment like `roles_{role}`.
-    // Instead, explicit match rules for each role collection are provided to ensure security.
     match /roles_admin/{userId} {
-      allow read, create, update, delete: if false;
+      // Admin roles must be assigned via a trusted backend, not from the client.
+      allow read, write: if false;
     }
     match /roles_doctor/{userId} {
-      allow read, create, update, delete: if false;
+      // Allow a user to create their own 'doctor' role document upon registration.
+      // Disallow any other client-side access.
+      allow create: if isOwner(userId);
+      allow read, update, delete: if false;
     }
     match /roles_staff/{userId} {
-      allow read, create, update, delete: if false;
+      // Allow a user to create their own 'staff' role document upon registration.
+      // Disallow any other client-side access.
+      allow create: if isOwner(userId);
+      allow read, update, delete: if false;
     }
 
     // --------------------------------------------------------------------
