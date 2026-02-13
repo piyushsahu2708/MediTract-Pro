@@ -48,7 +48,7 @@ export default function PatientsPage() {
                             Fill in the details below to add a new patient record.
                         </DialogDescription>
                         </DialogHeader>
-                        <PatientForm onSuccess={() => setOpen(false)} user={user} />
+                        <PatientForm onSuccess={() => setOpen(false)} />
                     </DialogContent>
                 </Dialog>
             </PageHeader>
