@@ -1,0 +1,514 @@
+{
+  "entities": {
+    "Patient": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Patient",
+      "type": "object",
+      "description": "Represents a patient in the MediTrack Pro system, storing their demographic and key medical information. This entity is central for patient record management, allowing addition, modification, and deletion of patient data.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Patient entity."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The first name of the patient."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the patient."
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "description": "The patient's date of birth in YYYY-MM-DD format.",
+          "format": "date"
+        },
+        "gender": {
+          "type": "string",
+          "description": "The gender of the patient."
+        },
+        "contactNumber": {
+          "type": "string",
+          "description": "The primary contact number for the patient."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the patient.",
+          "format": "email"
+        },
+        "address": {
+          "type": "string",
+          "description": "The full residential address of the patient."
+        },
+        "emergencyContactName": {
+          "type": "string",
+          "description": "The name of the patient's emergency contact."
+        },
+        "emergencyContactNumber": {
+          "type": "string",
+          "description": "The contact number for the patient's emergency contact."
+        },
+        "admissionDate": {
+          "type": "string",
+          "description": "The date and time when the patient was admitted or began a major care workflow.",
+          "format": "date-time"
+        },
+        "dischargeDate": {
+          "type": "string",
+          "description": "The date and time when the patient was discharged or completed a major care workflow. This field can be null if the patient is not yet discharged.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "dateOfBirth",
+        "gender",
+        "contactNumber",
+        "email",
+        "address",
+        "emergencyContactName",
+        "emergencyContactNumber",
+        "admissionDate"
+      ]
+    },
+    "Doctor": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Doctor",
+      "type": "object",
+      "description": "Represents a medical doctor within the MediTrack Pro system, crucial for assigning appointments and managing patient workflows.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Doctor entity."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The first name of the doctor."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the doctor."
+        },
+        "specialization": {
+          "type": "string",
+          "description": "The medical specialization of the doctor (e.g., 'Cardiology', 'Pediatrics')."
+        },
+        "contactNumber": {
+          "type": "string",
+          "description": "The primary contact number for the doctor."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the doctor.",
+          "format": "email"
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "specialization",
+        "contactNumber",
+        "email"
+      ]
+    },
+    "Appointment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Appointment",
+      "type": "object",
+      "description": "Records details of scheduled patient appointments with doctors, enabling efficient scheduling and tracking of visit status.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Appointment entity."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to the Patient attending this appointment. (Relationship: Patient 1:N Appointment)"
+        },
+        "doctorId": {
+          "type": "string",
+          "description": "Reference to the Doctor assigned to this appointment. (Relationship: Doctor 1:N Appointment)"
+        },
+        "appointmentDateTime": {
+          "type": "string",
+          "description": "The date and time scheduled for the appointment.",
+          "format": "date-time"
+        },
+        "reasonForVisit": {
+          "type": "string",
+          "description": "The primary reason the patient is visiting the doctor."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the appointment (e.g., 'Scheduled', 'Completed', 'Canceled', 'No-show')."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Any additional notes or comments related to the appointment."
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "doctorId",
+        "appointmentDateTime",
+        "reasonForVisit",
+        "status"
+      ]
+    },
+    "MedicalRecord": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MedicalRecord",
+      "type": "object",
+      "description": "Captures detailed medical information for a patient visit or consultation, including symptoms, diagnoses, and treatment plans, supporting patient record management and AI diagnostic integration.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MedicalRecord entity."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to the Patient this medical record belongs to. (Relationship: Patient 1:N MedicalRecord)"
+        },
+        "doctorId": {
+          "type": "string",
+          "description": "Reference to the Doctor who created or updated this medical record. (Relationship: Doctor 1:N MedicalRecord)"
+        },
+        "recordDateTime": {
+          "type": "string",
+          "description": "The date and time when this medical record was created or last updated.",
+          "format": "date-time"
+        },
+        "recordType": {
+          "type": "string",
+          "description": "The type of medical record (e.g., 'Consultation Note', 'Diagnostic Report', 'Progress Note')."
+        },
+        "symptomsReported": {
+          "type": "string",
+          "description": "A description of the symptoms reported by the patient."
+        },
+        "examinationFindings": {
+          "type": "string",
+          "description": "Clinical findings from the physical examination or diagnostic tests."
+        },
+        "aiDiagnosticSuggestions": {
+          "type": "string",
+          "description": "Suggestions generated by the AI-powered diagnostic tool, if applicable."
+        },
+        "finalDiagnosis": {
+          "type": "string",
+          "description": "The confirmed diagnosis provided by the doctor."
+        },
+        "treatmentPlan": {
+          "type": "string",
+          "description": "The proposed treatment plan for the diagnosed condition."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Any additional important notes or observations."
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "doctorId",
+        "recordDateTime",
+        "recordType",
+        "symptomsReported",
+        "finalDiagnosis"
+      ]
+    },
+    "Medication": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Medication",
+      "type": "object",
+      "description": "A catalog of available medications, providing general details for prescription and management.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Medication entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The generic or brand name of the medication."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the medication, its purpose, or active ingredients."
+        },
+        "dosageForm": {
+          "type": "string",
+          "description": "The physical form of the medication (e.g., 'Tablet', 'Capsule', 'Liquid', 'Injection')."
+        },
+        "strength": {
+          "type": "string",
+          "description": "The strength of the medication (e.g., '500mg', '10ml', '200IU')."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "dosageForm",
+        "strength"
+      ]
+    },
+    "PatientMedication": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PatientMedication",
+      "type": "object",
+      "description": "Records specific medication prescriptions for a patient, including dosage, frequency, and reminder schedule, used by the medication reminder tool.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the PatientMedication entity."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to the Patient for whom this medication is prescribed. (Relationship: Patient 1:N PatientMedication)"
+        },
+        "medicationId": {
+          "type": "string",
+          "description": "Reference to the Medication from the catalog. (Relationship: Medication 1:N PatientMedication)"
+        },
+        "dosage": {
+          "type": "string",
+          "description": "The specific dosage prescribed (e.g., '2 tablets', '5ml')."
+        },
+        "frequency": {
+          "type": "string",
+          "description": "How often the medication should be taken (e.g., 'Once daily', 'Every 8 hours', 'As needed')."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "The date when the medication prescription started.",
+          "format": "date"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "The date when the medication prescription is expected to end. Can be null if ongoing.",
+          "format": "date"
+        },
+        "reminderSchedule": {
+          "type": "string",
+          "description": "Details for medication reminders, generated by AI or set manually (e.g., 'Take with breakfast at 8 AM', 'Before bedtime')."
+        },
+        "isActive": {
+          "type": "boolean",
+          "description": "Indicates if the medication prescription is currently active (true) or completed/stopped (false)."
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "medicationId",
+        "dosage",
+        "frequency",
+        "startDate",
+        "isActive"
+      ]
+    },
+    "WorkflowStage": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WorkflowStage",
+      "type": "object",
+      "description": "Defines a predefined stage within a patient's care workflow (e.g., Admission, Consultation, Discharge).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WorkflowStage entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the workflow stage (e.g., 'Admission', 'Initial Consultation', 'Treatment Phase', 'Discharge Planning')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of what this workflow stage entails."
+        },
+        "order": {
+          "type": "number",
+          "description": "A numerical value indicating the sequence of this stage within a typical workflow."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "order"
+      ]
+    },
+    "PatientWorkflow": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PatientWorkflow",
+      "type": "object",
+      "description": "Tracks a specific patient's progress through different workflow stages, enabling comprehensive workflow management from admission to discharge.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the PatientWorkflow instance."
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Reference to the Patient whose workflow is being tracked. (Relationship: Patient 1:N PatientWorkflow)"
+        },
+        "workflowStageId": {
+          "type": "string",
+          "description": "Reference to the specific WorkflowStage this patient is currently in or has completed. (Relationship: WorkflowStage 1:N PatientWorkflow)"
+        },
+        "assignedToDoctorId": {
+          "type": "string",
+          "description": "Reference to the Doctor primarily responsible for this patient during this workflow stage. (Relationship: Doctor 1:N PatientWorkflow)"
+        },
+        "startDate": {
+          "type": "string",
+          "description": "The date and time when the patient entered this workflow stage.",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "The date and time when the patient completed this workflow stage. Can be null if the stage is still in progress.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of this workflow stage for the patient (e.g., 'Pending', 'In Progress', 'Completed', 'On Hold', 'Skipped')."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Any additional notes specific to the patient's progression through this workflow stage."
+        }
+      },
+      "required": [
+        "id",
+        "patientId",
+        "workflowStageId",
+        "assignedToDoctorId",
+        "startDate",
+        "status"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "UserRoleAdmin",
+          "schema": {
+            "$ref": "#/backend/entities/UserRoleAdmin"
+          },
+          "description": "Admin roles for users. Documents in this collection signify that the `userId` has administrative privileges. Used for DBAC (Database Access Control) to allow admins to perform sensitive operations like adding or deleting core patient data, and managing system configurations. This collection contains simple placeholder documents where the ID is the user's UID. This supports Authorization Independence by enabling direct 'exists()' checks in security rules."
+        }
+      },
+      {
+        "path": "/roles_doctor/{userId}",
+        "definition": {
+          "entityName": "UserRoleDoctor",
+          "schema": {
+            "$ref": "#/backend/entities/UserRoleDoctor"
+          },
+          "description": "Doctor roles for users. Documents in this collection signify that the `userId` has doctor privileges. Used for DBAC to allow doctors to access and manage patient-specific medical data they are assigned to or are responsible for. This collection contains simple placeholder documents where the ID is the user's UID. This supports Authorization Independence by enabling direct 'exists()' checks in security rules."
+        }
+      },
+      {
+        "path": "/roles_staff/{userId}",
+        "definition": {
+          "entityName": "UserRoleStaff",
+          "schema": {
+            "$ref": "#/backend/entities/UserRoleStaff"
+          },
+          "description": "Staff roles for users. Documents in this collection signify that the `userId` has general staff privileges. Used for DBAC to allow staff to perform operations like adding new patient records or managing appointments. This collection contains simple placeholder documents where the ID is the user's UID. This supports Authorization Independence by enabling direct 'exists()' checks in security rules."
+        }
+      },
+      {
+        "path": "/patients/{patientId}",
+        "definition": {
+          "entityName": "Patient",
+          "schema": {
+            "$ref": "#/backend/entities/Patient"
+          },
+          "description": "Stores individual patient demographic and key medical admission information. This is a top-level collection, with access controlled by authorized roles (Admins, Doctors, Staff). Create/Delete operations for patients are restricted to `roles_admin` and `roles_staff`. Read/Update operations can be granted to `roles_doctor` for assigned patients or `roles_staff` for general access, without needing parent lookups in rules."
+        }
+      },
+      {
+        "path": "/doctors/{doctorId}",
+        "definition": {
+          "entityName": "Doctor",
+          "schema": {
+            "$ref": "#/backend/entities/Doctor"
+          },
+          "description": "Stores details of medical doctors. The `doctorId` is expected to correspond to the `userId` in the `/roles_doctor/{userId}` collection. This enables doctors to manage their own profile and be referenced in patient-related documents (appointments, medical records). This collection is structurally segregated, ensuring consistent security for all doctor profiles."
+        }
+      },
+      {
+        "path": "/medications/{medicationId}",
+        "definition": {
+          "entityName": "Medication",
+          "schema": {
+            "$ref": "#/backend/entities/Medication"
+          },
+          "description": "A central catalog of available medications. This collection has a homogeneous security posture: readable by all authorized doctors and staff, writable only by administrators or specific pharmacy roles (if implemented). This structural segregation simplifies rules and supports QAPs for efficient lookup."
+        }
+      },
+      {
+        "path": "/workflowStages/{workflowStageId}",
+        "definition": {
+          "entityName": "WorkflowStage",
+          "schema": {
+            "$ref": "#/backend/entities/WorkflowStage"
+          },
+          "description": "Defines a predefined stage within a patient's care workflow (e.g., Admission, Consultation, Discharge). This acts as a global catalog, readable by all authorized doctors and staff, writable only by administrators. This structural segregation simplifies rules and supports QAPs for efficient lookup."
+        }
+      },
+      {
+        "path": "/patients/{patientId}/appointments/{appointmentId}",
+        "definition": {
+          "entityName": "Appointment",
+          "schema": {
+            "$ref": "#/backend/entities/Appointment"
+          },
+          "description": "Records details of scheduled patient appointments, nested under the specific patient. Includes denormalized `patientId` (from path) and `doctorId` fields to ensure Authorization Independence. Rules can directly check `resource.data.doctorId` against `request.auth.uid` for doctor-specific access, or check for `roles_staff` for general appointment management, without needing to 'get()' parent documents. Supports QAPs by allowing queries for all appointments of a patient or for a specific doctor (using collection group queries)."
+        }
+      },
+      {
+        "path": "/patients/{patientId}/medicalRecords/{medicalRecordId}",
+        "definition": {
+          "entityName": "MedicalRecord",
+          "schema": {
+            "$ref": "#/backend/entities/MedicalRecord"
+          },
+          "description": "Captures detailed medical information for a patient visit or consultation, nested under the specific patient. Includes denormalized `patientId` (from path) and `doctorId` fields to ensure Authorization Independence. Rules can check access based on the requesting user's role (e.g., `roles_doctor` or `roles_staff`) and the `doctorId` field in the document, without 'get()' operations. Supports QAPs for retrieving all medical records for a given patient."
+        }
+      },
+      {
+        "path": "/patients/{patientId}/patientMedications/{patientMedicationId}",
+        "definition": {
+          "entityName": "PatientMedication",
+          "schema": {
+            "$ref": "#/backend/entities/PatientMedication"
+          },
+          "description": "Records specific medication prescriptions for a patient, nested under the specific patient. Includes denormalized `patientId` (from path) and `medicationId` fields to ensure Authorization Independence. Access is typically for doctors and staff, and rules can be simple. Supports QAPs by allowing queries for all prescribed medications for a patient, and filtering by `isActive` status."
+        }
+      },
+      {
+        "path": "/patients/{patientId}/patientWorkflows/{patientWorkflowId}",
+        "definition": {
+          "entityName": "PatientWorkflow",
+          "schema": {
+            "$ref": "#/backend/entities/PatientWorkflow"
+          },
+          "description": "Tracks a specific patient's progress through different workflow stages, nested under the specific patient. Includes denormalized `patientId` (from path), `workflowStageId`, and `assignedToDoctorId` fields to ensure Authorization Independence. Rules can check `resource.data.assignedToDoctorId` against `request.auth.uid` for doctor-specific workflow management, or `roles_staff` for general oversight, without 'get()' operations. Supports QAPs for retrieving a patient's workflow history or querying by `status`."
+        }
+      }
+    ],
+    "reasoning": "The recommended Firestore data structure for MediTrack Pro prioritizes security, scalability, and debuggability by strictly adhering to the core design principles. The primary strategy is to use **structural segregation** for different security postures and **denormalization of authorization context** to achieve authorization independence.  \n\n**Authorization Independence (CRITICAL)** is achieved by two main mechanisms:\n1.  **Role-Based Access Control (DBAC):** User roles (admin, doctor, staff) are stored in dedicated top-level collections (e.g., `/roles_admin/{userId}`). This allows security rules to check for a user's role using simple `exists()` calls on these collections, completely eliminating the need for `get()` operations on user profiles or parent documents to determine authorization. This is crucial for atomic operations and simplifying rule logic.\n2.  **Denormalization in Subcollections:** For patient-related subcollections (e.g., `/patients/{patientId}/appointments`), critical authorization fields like `patientId` and `doctorId` (if an appointment is assigned to a specific doctor) are explicitly stored within each subcollection document. This means that a security rule for an `appointment` document can determine if the requesting user (`request.auth.uid`) is the associated doctor (by checking `request.auth.uid == resource.data.doctorId`) or if they have general patient access without performing a `get()` operation on the parent `/patients/{patientId}` document. The `patientId` itself is part of the hierarchical path, linking the subdocument directly to its parent without a `get()` lookup.\n\n**Queryable Authorization Paths (QAPs)** are supported by:\n*   **Structural Segregation:** Top-level collections like `/medications` and `/workflowStages` serve as catalogs with distinct security requirements, allowing efficient, broad queries without user-specific filtering. For example, all authorized users can read the general medication catalog.\n*   **Hierarchical Paths for Patient-Specific Data:** The use of subcollections like `/patients/{patientId}/medicalRecords` naturally scopes queries to a specific patient, making it easy to retrieve all medical records for a given patient. This also aligns with the `User 1:N Entity` and `Nested Data` access modeling patterns.\n*   **Denormalized Fields for Filtering:** Fields like `doctorId` in `appointments` or `assignedToDoctorId` in `patientWorkflows` allow for efficient collection group queries (where applicable and indexed) to find all appointments assigned to a specific doctor across all patients, without violating security or requiring complex rule filtering.\n\n**Addressing User Request ('i cant delete patients data and add new patients'):**\nThis structure directly addresses the user's issue. By establishing `roles_admin` and `roles_staff` collections, security rules can be written to explicitly grant `create` permissions on `/patients` documents to users found in `/roles_admin` or `/roles_staff`. Similarly, `delete` permissions on `/patients` (and cascaded deletion for subcollections via Cloud Functions or dedicated rules) can be granted exclusively to users in `/roles_admin`. This provides clear, debuggable, and atomic authorization for patient data management."
+  }
+}
