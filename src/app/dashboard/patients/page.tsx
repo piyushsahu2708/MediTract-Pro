@@ -21,7 +21,7 @@ import PatientForm from "./components/patient-form"
 
 export default function PatientsPage() {
     const firestore = useFirestore()
-    const { user } = useUser();
+    const { user, isUserLoading } = useUser();
     const patientsCollection = useMemoFirebase(() => {
         if (!user) return null;
         return collection(firestore, "patients")
@@ -29,12 +29,14 @@ export default function PatientsPage() {
     const { data: patients, isLoading } = useCollection<Patient>(patientsCollection)
     const [open, setOpen] = React.useState(false);
 
+    const effectiveIsLoading = isUserLoading || isLoading;
+
     return (
         <>
             <PageHeader title="Patients">
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
-                        <Button>
+                        <Button disabled={isUserLoading}>
                             <PlusCircle className="mr-2" />
                             Add Patient
                         </Button>
@@ -46,11 +48,11 @@ export default function PatientsPage() {
                             Fill in the details below to add a new patient record.
                         </DialogDescription>
                         </DialogHeader>
-                        <PatientForm onSuccess={() => setOpen(false)} />
+                        <PatientForm onSuccess={() => setOpen(false)} user={user} />
                     </DialogContent>
                 </Dialog>
             </PageHeader>
-            {isLoading ? (
+            {effectiveIsLoading ? (
                 <div className="flex justify-center items-center h-64">
                     <Loader2 className="h-12 w-12 animate-spin" />
                 </div>

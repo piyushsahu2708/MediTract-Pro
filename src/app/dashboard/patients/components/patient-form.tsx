@@ -6,13 +6,14 @@ import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { FirestorePermissionError, errorEmitter, useFirestore, useUser } from "@/firebase"
+import { FirestorePermissionError, errorEmitter, useFirestore } from "@/firebase"
 import { collection, setDoc, doc } from "firebase/firestore"
 import { useState } from "react"
 import { Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { format, parse } from "date-fns"
+import type { User } from "firebase/auth"
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -30,11 +31,11 @@ type FormValues = z.infer<typeof formSchema>
 
 interface PatientFormProps {
     onSuccess: () => void;
+    user: User | null;
 }
 
-export default function PatientForm({ onSuccess }: PatientFormProps) {
+export default function PatientForm({ onSuccess, user }: PatientFormProps) {
   const firestore = useFirestore()
-  const { user } = useUser();
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
@@ -53,6 +54,7 @@ export default function PatientForm({ onSuccess }: PatientFormProps) {
   })
 
   function onSubmit(values: FormValues) {
+    setIsLoading(true);
     if (!user) {
         toast({
             variant: "destructive",
@@ -62,7 +64,7 @@ export default function PatientForm({ onSuccess }: PatientFormProps) {
         setIsLoading(false);
         return;
     }
-    setIsLoading(true);
+    
     const patientsCollection = collection(firestore, "patients");
     const newPatientRef = doc(patientsCollection);
     
