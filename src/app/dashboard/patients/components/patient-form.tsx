@@ -12,17 +12,13 @@ import { useState } from "react"
 import { Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { CalendarIcon } from "lucide-react"
-import { Calendar } from "@/components/ui/calendar"
-import { cn } from "@/lib/utils"
-import { format } from "date-fns"
+import { format, parse } from "date-fns"
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
-  dateOfBirth: z.date({ required_error: "Date of birth is required." }),
+  dateOfBirth: z.string().regex(/^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/, { message: "Invalid date format. Use DD/MM/YYYY" }),
   gender: z.enum(["Male", "Female", "Other"]),
   contactNumber: z.string().min(1, "Contact number is required"),
   address: z.string().min(1, "Address is required"),
@@ -43,16 +39,29 @@ export default function PatientForm({ onSuccess }: PatientFormProps) {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      dateOfBirth: "",
+      contactNumber: "",
+      address: "",
+      emergencyContactName: "",
+      emergencyContactNumber: "",
+    }
   })
 
   function onSubmit(values: FormValues) {
     setIsLoading(true);
     const patientsCollection = collection(firestore, "patients");
     const newPatientRef = doc(patientsCollection);
+    
+    const parsedDate = parse(values.dateOfBirth, 'dd/MM/yyyy', new Date());
+
     const newPatient = {
         ...values,
         id: newPatientRef.id,
-        dateOfBirth: format(values.dateOfBirth, "yyyy-MM-dd"),
+        dateOfBirth: format(parsedDate, "yyyy-MM-dd"),
         admissionDate: new Date().toISOString(),
     };
     
@@ -129,47 +138,17 @@ export default function PatientForm({ onSuccess }: PatientFormProps) {
 
         <div className="grid grid-cols-2 gap-4">
             <FormField
-                control={form.control}
-                name="dateOfBirth"
-                render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                    <FormLabel>Date of birth</FormLabel>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                        <FormControl>
-                            <Button
-                            variant={"outline"}
-                            className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                            )}
-                            >
-                            {field.value ? (
-                                format(field.value, "PPP")
-                            ) : (
-                                <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                        </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
-                            }
-                            caption_layout="dropdown-buttons"
-                            fromYear={1900}
-                            toYear={new Date().getFullYear()}
-                        />
-                        </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                    </FormItem>
-                )}
+              control={form.control}
+              name="dateOfBirth"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date of Birth</FormLabel>
+                  <FormControl>
+                    <Input placeholder="DD/MM/YYYY" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
             <FormField
             control={form.control}
